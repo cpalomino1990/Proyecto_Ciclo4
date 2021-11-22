@@ -3,14 +3,15 @@ import {repository} from '@loopback/repository';
 import {config} from '../config/config';
 import {Usuario} from '../models';
 import {UsuarioRepository} from '../repositories';
+const jwt = require('jsonwebtoken');
 const generator = require("password-generator");
 const cryptoJS = require("crypto-js");
-const jwt = require('jsonwebtoken');
 
 @injectable({scope: BindingScope.TRANSIENT})
 export class AuthService {
   constructor(@repository(UsuarioRepository)
-  public usuarioRepository: UsuarioRepository) { }
+  public usuarioRepository: UsuarioRepository,) {
+  }
 
   //Generacion de claves
   GenerarClave() {
@@ -23,6 +24,7 @@ export class AuthService {
     return claveCifrada;
   }
 
+  //JWT
   GenerarTokenJWT(usuario: Usuario) {
     let token = jwt.sign({
       data: {
@@ -34,6 +36,7 @@ export class AuthService {
 
     return token
   }
+  //validacion token
   validarTokenJWT(token: string) {
     try {
       let datos = jwt.verify(token, config.claveJWT);
@@ -42,6 +45,7 @@ export class AuthService {
       return false;
     }
   }
+
   //Autenticacion
   IdentificarPersona(correo: string, password: string) {
     try {
@@ -54,6 +58,9 @@ export class AuthService {
       return false;
     }
   }
+
+
+
 
 
   /*
